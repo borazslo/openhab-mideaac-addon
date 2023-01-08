@@ -212,6 +212,14 @@ public class EcowattHandler extends BaseThingHandler {
         if ((channelId == null || CHANNEL_TOMORROW_SIGNAL.equals(channelId)) && isLinked(CHANNEL_TOMORROW_SIGNAL)) {
             updateState(CHANNEL_TOMORROW_SIGNAL, getDaySignalState(response, now.plusDays(1)));
         }
+        if ((channelId == null || CHANNEL_IN_TWO_DAYS_SIGNAL.equals(channelId))
+                && isLinked(CHANNEL_IN_TWO_DAYS_SIGNAL)) {
+            updateState(CHANNEL_IN_TWO_DAYS_SIGNAL, getDaySignalState(response, now.plusDays(2)));
+        }
+        if ((channelId == null || CHANNEL_IN_THREE_DAYS_SIGNAL.equals(channelId))
+                && isLinked(CHANNEL_IN_THREE_DAYS_SIGNAL)) {
+            updateState(CHANNEL_IN_THREE_DAYS_SIGNAL, getDaySignalState(response, now.plusDays(3)));
+        }
         if ((channelId == null || CHANNEL_CURRENT_HOUR_SIGNAL.equals(channelId))
                 && isLinked(CHANNEL_CURRENT_HOUR_SIGNAL)) {
             updateState(CHANNEL_CURRENT_HOUR_SIGNAL, getHourSignalState(response, now));
@@ -220,14 +228,28 @@ public class EcowattHandler extends BaseThingHandler {
         return retryDelay;
     }
 
-    private State getDaySignalState(@Nullable EcowattApiResponse response, ZonedDateTime dateTime) {
+    /**
+     * Get the signal applicable for a given day from the API response
+     *
+     * @param response the API response
+     * @param dateTime the date and time to consider
+     * @return the found valid signal as a channel state or UndefType.UNDEF if not found
+     */
+    public static State getDaySignalState(@Nullable EcowattApiResponse response, ZonedDateTime dateTime) {
         EcowattDaySignals signals = response == null ? null : response.getDaySignals(dateTime);
         return signals != null && signals.getDaySignal() >= 1 && signals.getDaySignal() <= 3
                 ? new DecimalType(signals.getDaySignal())
                 : UnDefType.UNDEF;
     }
 
-    private State getHourSignalState(@Nullable EcowattApiResponse response, ZonedDateTime dateTime) {
+    /**
+     * Get the signal applicable for a given day and hour from the API response
+     *
+     * @param response the API response
+     * @param dateTime the date and time to consider
+     * @return the found valid signal as a channel state or UndefType.UNDEF if not found
+     */
+    public static State getHourSignalState(@Nullable EcowattApiResponse response, ZonedDateTime dateTime) {
         EcowattDaySignals signals = response == null ? null : response.getDaySignals(dateTime);
         ZonedDateTime day = signals == null ? null : signals.getDay();
         if (signals != null && day != null) {
@@ -235,7 +257,7 @@ public class EcowattHandler extends BaseThingHandler {
             // hour index in these data
             int hour = dateTime.withZoneSameInstant(day.getZone()).getHour();
             int value = signals.getHourSignal(hour);
-            logger.debug("hour {} value {}", hour, value);
+            LoggerFactory.getLogger(EcowattHandler.class).debug("hour {} value {}", hour, value);
             if (value >= 1 && value <= 3) {
                 return new DecimalType(value);
             }
