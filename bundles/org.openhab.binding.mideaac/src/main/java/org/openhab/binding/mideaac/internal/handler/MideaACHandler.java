@@ -919,8 +919,8 @@ public class MideaACHandler extends BaseThingHandler implements DiscoveryHandler
                                         data.length, Utils.bytesToHex(data));
                                 if (data.length > 0) {
                                     if (data.length != 25) {
-                                        logger.error("Response data is not 25 long!");
-                                        return;
+                                        logger.error("Response data is {} long instead of 25!", data.length);
+                                        // return;
                                     }
                                     lastResponse = new Response(data, getVersion());
                                     try {
