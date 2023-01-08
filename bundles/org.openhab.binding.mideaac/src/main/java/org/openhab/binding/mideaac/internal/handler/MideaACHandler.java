@@ -32,6 +32,7 @@ import javax.measure.quantity.Temperature;
 import javax.measure.spi.SystemOfUnits;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.client.HttpClient;
@@ -688,7 +689,7 @@ public class MideaACHandler extends BaseThingHandler implements DiscoveryHandler
                 // socket.bind(new InetSocketAddress(0)); // TODO: allow choosing adapter? // new InetSocketAddress(0)
                 // socket.setReuseAddress(true);
                 if (ipPort != null) {
-                    socket.connect(new InetSocketAddress(ipAddress, Integer.valueOf(ipPort)),
+                    socket.connect(new InetSocketAddress(ipAddress, NumberUtils.createInteger(ipPort)),
                             config.getTimeout() * 1000);
                 }
             } catch (IOException e) {
@@ -1006,7 +1007,7 @@ public class MideaACHandler extends BaseThingHandler implements DiscoveryHandler
             }
         }
 
-        private void processMessage(Response response) {
+        private void processMessage(@Nullable Response response) {
 
             updateChannel(CHANNEL_POWER, response.getPowerState() == true ? OnOffType.ON : OnOffType.OFF);
             updateChannel(CHANNEL_IMODE_RESUME, response.getImmodeResume() == true ? OnOffType.ON : OnOffType.OFF);
