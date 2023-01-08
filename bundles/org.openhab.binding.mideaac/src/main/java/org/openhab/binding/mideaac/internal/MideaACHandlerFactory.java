@@ -74,7 +74,6 @@ public class MideaACHandlerFactory extends BaseThingHandlerFactory {
         this.unitProvider = unitProvider;
         this.httpClient = httpClientFactory.getCommonHttpClient();
         clouds = new Clouds();
-
     }
 
     @Override

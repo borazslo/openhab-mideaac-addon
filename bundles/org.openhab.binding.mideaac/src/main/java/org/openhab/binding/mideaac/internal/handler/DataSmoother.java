@@ -1,9 +1,6 @@
 package org.openhab.binding.mideaac.internal.handler;
 
 import java.text.DecimalFormat;
-
-//import static org.openhab.binding.mideaac.internal.MideaACBindingConstants.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -51,6 +48,5 @@ public class DataSmoother {
     }
 
     public DataSmoother() {
-
     }
 }

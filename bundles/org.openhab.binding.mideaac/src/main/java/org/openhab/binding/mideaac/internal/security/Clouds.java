@@ -24,5 +24,4 @@ public class Clouds {
         }
         return add(email, password, cloudProvider);
     }
-
 }

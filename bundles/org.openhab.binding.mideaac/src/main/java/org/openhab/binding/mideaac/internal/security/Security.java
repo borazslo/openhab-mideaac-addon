@@ -367,7 +367,6 @@ public class Security {
         }
 
         return plainText;
-
     }
 
     private byte[] aes_cbc_encrypt(byte[] plainText, byte[] encrypt_key) {

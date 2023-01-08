@@ -323,6 +323,5 @@ public class Cloud {
 
     private void handle_api_error(int asInt, @NonNull String asString) {
         // TODO Auto-generated method stub
-
     }
 }

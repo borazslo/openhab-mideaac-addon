@@ -70,7 +70,6 @@ public class Connection implements Closeable {
             DatagramPacket sendPkt = new DatagramPacket(command, command.length, iNetAddress, MIDEAAC_SEND_PORT2);
             socket.send(sendPkt);
         }
-
     }
 
     @Override

@@ -90,6 +90,5 @@ public class CloudProvider {
         }
 
         return null;
-
     }
 }

@@ -134,7 +134,6 @@ public class CommandBase {
             // TODO Auto-generated method stub
             return super.toString().replace("2", "").replace("3", "");
         }
-
     }
 
     /**
@@ -199,5 +198,4 @@ public class CommandBase {
         sum = (byte) ((255 - (sum % 256)) + 1);
         return (byte) sum;
     }
-
 }

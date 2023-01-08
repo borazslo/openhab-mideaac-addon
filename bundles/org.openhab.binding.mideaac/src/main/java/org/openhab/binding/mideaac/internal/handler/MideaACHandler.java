@@ -1137,5 +1137,4 @@ public class MideaACHandler extends BaseThingHandler implements DiscoveryHandler
             cancelConnectionMonitorJob();
         }
     }
-
 }
