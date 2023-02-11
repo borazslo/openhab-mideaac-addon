@@ -913,16 +913,62 @@ public class MideaACHandler extends BaseThingHandler implements DiscoveryHandler
                             if (response.length > 40 + 16) {
                                 byte[] data = mideaACHandler.getSecurity()
                                         .aes_decrypt(Arrays.copyOfRange(response, 40, response.length - 16));
+
+                                // data[1]: BodyType
+                                byte bodyType = data[0x1];
+
+                                // data[3]: Device Type - 0xAC = AC
+                                // https://github.com/georgezhao2010/midea_ac_lan/blob/06fc4b582a012bbbfd6bd5942c92034270eca0eb/custom_components/midea_ac_lan/midea_devices.py#L96
+
+                                // data[9]: MessageType - set, query, notify1, notify2, exception, querySN, exception2,
+                                // querySubtype
+                                // https://github.com/georgezhao2010/midea_ac_lan/blob/30d0ff5ff14f150da10b883e97b2f280767aa89a/custom_components/midea_ac_lan/midea/core/message.py#L22-L29
+                                String responseType = "";
+                                switch (data[0x9]) {
+                                    case 0x02:
+                                        responseType = "set";
+                                        break;
+                                    case 0x03:
+                                        responseType = "query";
+                                        break;
+                                    case 0x04:
+                                        responseType = "notify1";
+                                        break;
+                                    case 0x05:
+                                        responseType = "notify2";
+                                        break;
+                                    case 0x06:
+                                        responseType = "exception";
+                                        break;
+                                    case 0x07:
+                                        responseType = "querySN";
+                                        break;
+                                    case 0x0A:
+                                        responseType = "exception2";
+                                        break;
+                                    case 0x09: // Helyesen: 0xA0
+                                        responseType = "querySubtype";
+                                        break;
+                                    default:
+                                        logger.error("Invalid response type: {}", data[0x9]);
+                                        // code block
+                                }
+                                logger.trace("Response Type: {}", responseType);
+
                                 // The response data from the appliance includes a packet header which we don't want
                                 data = Arrays.copyOfRange(data, 10, data.length);
-                                logger.trace("Bytes decoded and stripped without header: length: {}, data: {}",
+                                logger.trace("Bytes in HEX, decoded and stripped without header: length: {}, data: {}",
                                         data.length, Utils.bytesToHex(data));
+                                logger.trace(
+                                        "Bytes in BINARY, decoded and stripped without header: length: {}, data: {}",
+                                        data.length, Utils.bytesToBinary(data));
+
                                 if (data.length > 0) {
                                     if (data.length != 25) {
                                         logger.error("Response data is {} long instead of 25!", data.length);
                                         // return;
                                     }
-                                    lastResponse = new Response(data, getVersion());
+                                    lastResponse = new Response(data, getVersion(), responseType, bodyType);
                                     try {
                                         processMessage(lastResponse);
                                     } catch (Exception ex) {
@@ -939,7 +985,7 @@ public class MideaACHandler extends BaseThingHandler implements DiscoveryHandler
                         logger.trace("Bytes decoded and stripped without header: length: {}, data: {}", data.length,
                                 Utils.bytesToHex(data));
 
-                        lastResponse = new Response(data, getVersion());
+                        lastResponse = new Response(data, getVersion(), "", (byte) 0x00);
                         processMessage(lastResponse);
                     }
                     return;

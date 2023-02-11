@@ -22,41 +22,51 @@ public class Response {
         return version;
     }
 
-    public Response(byte[] data, int version) {
+    public Response(byte[] data, int version, String responseType, byte bodyType) {
         this.data = data;
         this.version = version;
 
-        logger.trace("PowerState: {}", getPowerState());
-        logger.trace("ImodeResume: {}", getImmodeResume());
-        logger.trace("TimerMode: {}", getTimerMode());
-        logger.trace("ApplianceError: {}", getApplianceError());
-        logger.trace("TargetTemperature: {}", getTargetTemperature());
-        logger.trace("OperationalMode: {}", getOperationalMode());
-        logger.trace("FanSpeed: {}", getFanSpeed());
-        logger.trace("OnTimer: {}", getOnTimer());
-        logger.trace("OffTimer: {}", getOffTimer());
-        logger.trace("SwingMode: {}", getSwingMode());
-        logger.trace("CozySleep: {}", getCozySleep());
-        logger.trace("Save: {}", getSave());
-        logger.trace("LowFrequencyFan: {}", getLowFrequencyFan());
-        logger.trace("SuperFan: {}", getSuperFan());
-        logger.trace("FeelOwn: {}", getFeelOwn());
-        logger.trace("ChildSleepMode: {}", getChildSleepMode());
-        logger.trace("ExchangeAir: {}", getExchangeAir());
-        logger.trace("DryClean: {}", getDryClean());
-        logger.trace("AuxHeat: {}", getAuxHeat());
-        logger.trace("EcoMode: {}", getEcoMode());
-        logger.trace("CleanUp: {}", getCleanUp());
-        logger.trace("TempUnit: {}", getTempUnit());
-        logger.trace("SleepFunction: {}", getSleepFunction());
-        logger.trace("TurboMode: {}", getTurboMode());
-        logger.trace("CatchCold: {}", getCatchCold());
-        logger.trace("NightLight: {}", getNightLight());
-        logger.trace("PeakElec: {}", getPeakElec());
-        logger.trace("NaturalFan: {}", getNaturalFan());
-        logger.trace("IndoorTemperature: {}", getIndoorTemperature());
-        logger.trace("OutdoorTemperature: {}", getOutdoorTemperature());
-        logger.trace("Humidity: {}", getHumidity());
+        if (version == 3) {
+            // https://github.com/georgezhao2010/midea_ac_lan/blob/06fc4b582a012bbbfd6bd5942c92034270eca0eb/custom_components/midea_ac_lan/midea/devices/ac/message.py#L418
+            if ((bodyType == 0xB0 && bodyType == 0xB1 && bodyType == 0xB5)
+                    || (responseType == "notify" && responseType == "set" && responseType == "query")) {
+                // XBXMessageBody
+            }
+
+        } else {
+
+            logger.trace("PowerState: {}", getPowerState());
+            logger.trace("ImodeResume: {}", getImmodeResume());
+            logger.trace("TimerMode: {}", getTimerMode());
+            logger.trace("ApplianceError: {}", getApplianceError());
+            logger.trace("TargetTemperature: {}", getTargetTemperature());
+            logger.trace("OperationalMode: {}", getOperationalMode());
+            logger.trace("FanSpeed: {}", getFanSpeed());
+            logger.trace("OnTimer: {}", getOnTimer());
+            logger.trace("OffTimer: {}", getOffTimer());
+            logger.trace("SwingMode: {}", getSwingMode());
+            logger.trace("CozySleep: {}", getCozySleep());
+            logger.trace("Save: {}", getSave());
+            logger.trace("LowFrequencyFan: {}", getLowFrequencyFan());
+            logger.trace("SuperFan: {}", getSuperFan());
+            logger.trace("FeelOwn: {}", getFeelOwn());
+            logger.trace("ChildSleepMode: {}", getChildSleepMode());
+            logger.trace("ExchangeAir: {}", getExchangeAir());
+            logger.trace("DryClean: {}", getDryClean());
+            logger.trace("AuxHeat: {}", getAuxHeat());
+            logger.trace("EcoMode: {}", getEcoMode());
+            logger.trace("CleanUp: {}", getCleanUp());
+            logger.trace("TempUnit: {}", getTempUnit());
+            logger.trace("SleepFunction: {}", getSleepFunction());
+            logger.trace("TurboMode: {}", getTurboMode());
+            logger.trace("CatchCold: {}", getCatchCold());
+            logger.trace("NightLight: {}", getNightLight());
+            logger.trace("PeakElec: {}", getPeakElec());
+            logger.trace("NaturalFan: {}", getNaturalFan());
+            logger.trace("IndoorTemperature: {}", getIndoorTemperature());
+            logger.trace("OutdoorTemperature: {}", getOutdoorTemperature());
+            logger.trace("Humidity: {}", getHumidity());
+        }
     }
 
     public boolean getPowerState() {
