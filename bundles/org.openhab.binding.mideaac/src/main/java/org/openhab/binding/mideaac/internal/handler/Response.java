@@ -17,6 +17,8 @@ public class Response {
     private Logger logger = LoggerFactory.getLogger(Response.class);
 
     private final int version;
+    String responseType;
+    byte bodyType;
 
     private int getVersion() {
         return version;
@@ -25,12 +27,25 @@ public class Response {
     public Response(byte[] data, int version, String responseType, byte bodyType) {
         this.data = data;
         this.version = version;
+        this.bodyType = bodyType;
+        this.responseType = responseType;
 
         if (version == 3) {
+            logger.trace("Response and Body Type: {}, {}", responseType, bodyType);
             // https://github.com/georgezhao2010/midea_ac_lan/blob/06fc4b582a012bbbfd6bd5942c92034270eca0eb/custom_components/midea_ac_lan/midea/devices/ac/message.py#L418
-            if ((bodyType == 0xB0 && bodyType == 0xB1 && bodyType == 0xB5)
-                    || (responseType == "notify" && responseType == "set" && responseType == "query")) {
-                // XBXMessageBody
+            if (responseType == "notify2" && bodyType == -95) { // 0xA0 = -95
+                logger.trace("Response Handler: XA0Message");
+            } else if (responseType == "notify1" && bodyType == -91) { // 0xA1 = -91
+                logger.trace("Response Handler: XA1Message");
+            } else if ((bodyType == 0xB0 || bodyType == 0xB1 || bodyType == 0xB5) // 0xB5 = -75
+                    && (responseType == "notify2" || responseType == "set" || responseType == "query")) {
+                logger.trace("Response Handler: XBXMessage");
+            } else if (bodyType == -64 && (responseType == "set" || responseType == "query")) { // 0xC0 = -64 ??
+                logger.trace("Response Handler: XCOMessage");
+            } else if (responseType == "query" && bodyType == 0xC1) {
+                logger.trace("Response Handler: XC1Message");
+            } else {
+                logger.trace("Response Handler: _general_");
             }
 
         } else {
@@ -67,6 +82,7 @@ public class Response {
             logger.trace("OutdoorTemperature: {}", getOutdoorTemperature());
             logger.trace("Humidity: {}", getHumidity());
         }
+
     }
 
     public boolean getPowerState() {
@@ -252,8 +268,24 @@ public class Response {
         return null;
     }
 
-    public float getOutdoorTemperature() {
-        return (Byte.toUnsignedInt(data[0x0c]) - 50) / 2.0f;
+    public Float getOutdoorTemperature() {
+        if (this.bodyType == -64 && (this.responseType == "set" || this.responseType == "query")) { // 0xC0 = -64 ??
+
+            if (data[12] != 0xFF) {
+                int temp_integer = (data[12] - 50) / 2;
+                double temp_decimal = ((data[15] & 0xF0) >> 4) * 0.1;
+                if (data[12] > 49) {
+                    return (float) (temp_integer + temp_decimal);
+                } else {
+                    return (float) (temp_integer - temp_decimal);
+                }
+            } else {
+                return null;
+            }
+        } else {
+            // return (Byte.toUnsignedInt(data[0x0c]) - 50) / 2.0f;
+            return (float) ((Byte.toUnsignedInt(data[12]) - 50) / 2);
+        }
     }
 
     public int getHumidity() {
